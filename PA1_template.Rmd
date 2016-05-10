@@ -26,19 +26,47 @@ step_DF$date <- as.Date(step_DF$date , "%Y-%m-%d")
 step_DF_na.omit <- na.omit(step_DF)
 
 # Aggregate steps as per date to get total number of steps in a day
-DailySteps <- aggregate(steps ~ date, step_DF_na.omit, sum)
+dailySteps <- aggregate(steps ~ date, step_DF_na.omit, sum)
 
 # Create histogram of total number of steps in a day
-hist(DailySteps$steps, col=1, main="Total number of steps per day", 
-     xlab="Total number of steps in a day")
+hist(dailySteps$steps, col=1, main="Total number of steps per day", xlab="Total number of steps in a day")
+
 ```
 ## Calculate mean and median of steps per day
 ```{r}
-mean(DailySteps$steps)
+meanSteps <- mean(dailySteps$steps)
+meanSteps
+
+medianSteps <- median(dailySteps$steps)
+medianSteps
+
+cat("Daily Steps mean = ", meanSteps, "and median = ", medianSteps)
 ```
 ## What is the average daily activity pattern?
+1. Make a time series plot (type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
+2. Which 5-minute interval contains the maximum number of steps?
 
+```{r}
+# aggregate steps to get average daily interval
+ internalSteps<- aggregate(steps ~ interval, step_DF_na.omit, mean)
 
+# Plot daily average interval
+plot(internalSteps$interval, internalSteps$steps, type='l', col=1, 
+     main="Average number of Daily Steps", xlab="Interval", 
+     ylab="Average number of steps")
+```
+
+```{r}
+# Got lazy and just did which.max and max
+maxSteps <- max(internalSteps$steps)
+maxSteps
+
+maxInternal <- which.max(internalSteps$steps)
+maxInternal
+
+cat("5-minute interval value = ", maxInternal, "and maximum steps = ", maxSteps)
+
+```
 
 ## Imputing missing values
 
