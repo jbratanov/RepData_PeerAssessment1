@@ -11,9 +11,6 @@ output:
 # Read in activity file
 step_DF <- read.csv(file="c:/coursera/ReproducibleData/week2/activity.csv",
                     sep = ",", header=TRUE)
-
-# Convert character to Date Class
-step_DF$date <- as.Date(step_DF$date , "%Y-%m-%d")
 ```
 ## What is mean total number of steps taken per day?
 ####For this assignment ignore the missing values.
@@ -119,4 +116,44 @@ cat("Imputed: Daily Steps mean = ", meanTotalSteps, "and median = ", medianTotal
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
+1. Create a new factor variable in the dataset with two levels – weekday and weekend indicating whether a given date is a weekday or weekend day.
+2.Make a panel plot containing a time series plot of the 5-minute interval and the average number of steps taken, averaged across all weekday days or weekend days.
+
+```{r}
+
+# convert date from string to Date class
+step_DF$date <- as.Date(step_DF$date, "%Y-%m-%d")
+
+# day of the week 
+step_DF$day <- weekdays(step_DF$date)
+
+# add a new column called day type and initialize to weekday
+step_DF$dayType <- c("weekday")
+
+# If day is Saturday or Sunday, make day type as weekend
+for (i in 1:nrow(step_DF))
+  {
+     if (step_DF$day[i] == "Saturday" || step_DF$day[i] == "Sunday")
+       {
+         step_DF$dayType[i] <- "weekend"
+       }
+  }
+
+# convert from character to factor
+step_DF$dayType <- as.factor(step_DF$dayType)
+
+# aggregate steps as interval to get average number of steps in an interval across all days
+intervalStepsImpute <- aggregate(steps ~ interval+dayType, step_DF, mean)
+```
+
+```{r}
+
+# make the panel plot for weekdays and weekends
+library(ggplot2)
+
+qplot(interval, steps, data=intervalStepsImpute, geom=c("line"), xlab="Interval", 
+      ylab="Number of steps", main="") + facet_wrap(~ dayType, ncol=1)
+
+```
