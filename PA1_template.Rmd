@@ -32,8 +32,9 @@ dailySteps <- aggregate(steps ~ date, step_DF_na.omit, sum)
 hist(dailySteps$steps, col=1, main="Total number of steps per day", xlab="Total number of steps in a day")
 
 ```
-## Calculate mean and median of steps per day
+
 ```{r}
+# Calculate mean and median of steps per day
 meanSteps <- mean(dailySteps$steps)
 meanSteps
 
@@ -69,7 +70,53 @@ cat("5-minute interval value = ", maxInternal, "and maximum steps = ", maxSteps)
 ```
 
 ## Imputing missing values
+Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
 
+1. Calculate the total number of missing values in the dataset.
+2. Devise a strategy for filling in all of the missing values in the dataset.
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+4. Make a histogram of the total number of steps taken daily and Calculate the mean and median. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+```{r}
+# get number of rows with NA's
+stepCnt_NA <- sum(is.na(step_DF))
+
+cat("The total number of NA's = ", stepCnt_NA)
+
+```
+
+```{r}
+# Fill in missing values
+# Will use the mean for like intervals to replace NA's.  
+for (i in 1:nrow(step_DF))
+  {
+    if (is.na(step_DF$steps[i]))
+      {
+         rowNum <- which(internalSteps$interval == step_DF$interval[i])
+         stepAvg <- round(internalSteps$steps[rowNum], digits=0)
+         step_DF$steps[i] <- stepAvg
+      }
+  }
+
+# Get total daily steps
+dailyTotalSteps <- aggregate(steps ~ date, step_DF, sum)
+
+# create histogram of total number of steps in a day
+hist(dailyTotalSteps$steps, col=1,
+    main="Total Daily Steps", xlab="Total Daily Steps")
+```
+
+```{r}
+# Calculate mean and median of steps per day
+meanTotalSteps <- mean(dailyTotalSteps$steps)
+meanTotalSteps
+
+medianTotalSteps <- median(dailyTotalSteps$steps)
+medianTotalSteps
+
+cat("Imputed: Daily Steps mean = ", meanTotalSteps, "and median = ", medianTotalSteps)
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
